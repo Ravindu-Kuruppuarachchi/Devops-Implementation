@@ -1,11 +1,3 @@
-from fastapi import FastAPI, HTTPException, Depends
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
-from pydantic import BaseModel
-from sqlalchemy import create_engine, Column, Integer, Float, desc
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
-import os
 
 # --- DATABASE CONFIGURATION ---
 SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:airarabia@localhost/number_db")
@@ -147,8 +139,3 @@ def read_root():
     print(".....................Hello This is to detect confilicts in merging .............")
     print("This is my second line to see conflicts in merging")
     return FileResponse('static/index.html')
-
-
-
-
-# --
