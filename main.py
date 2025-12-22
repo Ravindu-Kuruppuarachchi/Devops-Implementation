@@ -96,3 +96,7 @@ def read_index(x:int=0):
 def health_check():
     print("This is new part to see the health opf the application ............")
     return {"status": "ok"}
+
+@app.get("/ping")
+def ping():
+    return {"message": "pong"}
