@@ -67,3 +67,6 @@ def read_root():
     print(".....................Hello This is to detect confilicts in merging .............")
     return FileResponse('static/index.html')
 
+@app.get("/templates/index")
+def read_index():
+    print("Just to get a template index Html file ..................")
