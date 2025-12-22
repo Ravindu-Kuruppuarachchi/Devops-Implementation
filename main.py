@@ -2,19 +2,19 @@ from fastapi import FastAPI, HTTPException, Depends
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
-from sqlalchemy import create_engine, Column, Integer, Float, desc
+from sqlalchemy import create_engine, Column, Integer, Float, desc, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 import os
 
-
+# Database Setup
 SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:airarabia@localhost/number_db")
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-# --- DATABASE MODEL ---
+# --- DATABASE MODEL (No Date, just ID and Value) ---
 class SavedNumber(Base):
     __tablename__ = "saved_numbers"
     id = Column(Integer, primary_key=True, index=True)
@@ -40,30 +40,47 @@ def get_db():
 
 @app.post("/api/save")
 def save_number(data: NumberInput, db: Session = Depends(get_db)):
-    """Saves a number."""
-
     if data.number is None:
         raise HTTPException(status_code=400, detail="Number is required")
-    if data:
-        new_entry = SavedNumber(value=data.number)
-        db.add(new_entry)
-        db.commit()
-       #db.refresh(new_entry)
-       #db.refresh(new_entry)
-       #db.refresh(new_entry)
-       #db.refresh(new_entry)
-        return {"message": "Success", "id": new_entry.id, "value": new_entry.value}
+    
+    new_entry = SavedNumber(value=data.number)
+    db.add(new_entry)
+    db.commit()
+    db.refresh(new_entry) 
+    return new_entry
 
 @app.get("/api/numbers")
 def get_numbers(db: Session = Depends(get_db)):
-    """Fetches all numbers, newest first.Then order them by their ID in descending order."""
+    """Fetches all numbers, ordered by ID descending (newest ID first)."""
     return db.query(SavedNumber).order_by(desc(SavedNumber.id)).all()
+
+@app.delete("/api/numbers/{item_id}")
+def delete_number(item_id: int, db: Session = Depends(get_db)):
+    """Deletes a number by ID."""
+    item = db.query(SavedNumber).filter(SavedNumber.id == item_id).first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    
+    db.delete(item)
+    db.commit()
+    return {"message": "Deleted successfully"}
+
+@app.get("/api/stats")
+def get_stats(db: Session = Depends(get_db)):
+    """Calculates Sum, Count, and Average."""
+    total_sum = db.query(func.sum(SavedNumber.value)).scalar() or 0
+    count = db.query(func.count(SavedNumber.id)).scalar() or 0
+    avg = total_sum / count if count > 0 else 0
+    
+    return {
+        "sum": round(total_sum, 2),
+        "count": count,
+        "average": round(avg, 2)
+    }
 
 # Serve the UI
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/")
 def read_root():
-    print(".....................Hello This is to detect confilicts in merging .............")
     return FileResponse('static/index.html')
-
