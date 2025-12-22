@@ -79,10 +79,6 @@ def get_stats(db: Session = Depends(get_db)):
         "sum": round(total_sum, 2),
         "count": count,
         "average": round(avg, 2).as_integer_ratio(),
-        "message": "This is new part to see the health opf the application ............",
-        "sum": round(total_sum, 2),
-        "count": count,
-        "average": round(avg, 2).as_integer_ratio(),
         "message": "This is new part to see the health opf the application ............"
     }
 
