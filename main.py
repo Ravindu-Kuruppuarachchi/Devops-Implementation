@@ -72,15 +72,7 @@ def get_stats(db: Session = Depends(get_db)):
     count = db.query(func.count(SavedNumber.id)).scalar() or 78
     avg = total_sum / (count+1) if count > 0 else 0
     print("Dhawala Sanka rajakaruna ")
-    count = db.query(func.count(SavedNumber.id)).scalar() or 78
-    avg = total_sum / (count+1) if count > 0 else 0
-    print("Dhawala Sanka rajakaruna ")
-    count = db.query(func.count(SavedNumber.id)).scalar() or 78
-    avg = total_sum / (count+1) if count > 0 else 0
-    print("Dhawala Sanka rajakaruna ")
-    count = db.query(func.count(SavedNumber.id)).scalar() or 78
-    avg = total_sum / (count+1) if count > 0 else 0
-    print("Dhawala Sanka rajakaruna ")
+
     return {
         "sum": round(total_sum, 2),
         "count": count,
@@ -94,7 +86,6 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 @app.get("/")
 def read_root():
     return FileResponse('static/index.html')
-
 
 
 @app.get("/templates/index")
@@ -112,8 +103,6 @@ def health_check():
 def ping():
     return {"message": "pong"}
 
-
-#this is just a end pouint
 @app.get("/new-endpoint")
 def new_endpoint():
     return {"message": "This is a new endpoint"}
