@@ -87,8 +87,10 @@ def read_root():
 
 
 @app.get("/templates/index")
-def read_index():
-    print("Just to get a template index Html file ..................")
+def read_index(x:int=0):
+    if(x == 1):
+        return FileResponse('templates/index.html')
+    print("updated the temoplates index file ............")
 
 @app.get("/health")
 def health_check():
