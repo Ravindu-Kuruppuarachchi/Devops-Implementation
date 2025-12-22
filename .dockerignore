@@ -1,0 +1,22 @@
+# Ignore the local virtual environment
+venv/
+.venv/
+env/
+
+# Ignore git history
+.git/
+.gitignore
+
+# Ignore cache and temporary files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.db
+*.sqlite3
+
+# Ignore Docker-related files (optional, but good practice)
+Dockerfile
+docker-compose.yml
+*.tar

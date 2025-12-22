@@ -85,7 +85,6 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
-
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
@@ -137,5 +136,10 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 @app.get("/")
 def read_root():
     print(".....................Hello This is to detect confilicts in merging .............")
+
     print("This is my second line to see conflicts in merging")
     return FileResponse('static/index.html')
+
+    return FileResponse('static/index.html')
+# --
+

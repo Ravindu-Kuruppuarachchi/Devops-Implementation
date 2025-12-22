@@ -1,7 +1,8 @@
 # ==========================================
 # STAGE 1: The Builder
 # ==========================================
-FROM python:3.12.3-slim as builder
+# Use "AS" (uppercase) to name the stage
+FROM python:3.12.3-slim AS builder
 
 WORKDIR /app
 
@@ -9,11 +10,11 @@ WORKDIR /app
 RUN python -m venv /opt/venv
 
 # 2. Activate the virtual environment for the build stage
-#    (Any command run after this uses the venv python/pip)
 ENV PATH="/opt/venv/bin:$PATH"
 
-# 3. Install dependencies into the virtual environment
+# 3. Install dependencies
 COPY requirements.txt .
+# We use --no-cache-dir to keep the builder layer smaller, though it matters less here since this stage is discarded
 RUN pip install --no-cache-dir -r requirements.txt
 
 
@@ -25,17 +26,16 @@ FROM python:3.12.3-slim
 WORKDIR /app
 
 # 1. Copy the Virtual Environment from the Builder stage
-#    (We copy the whole folder /opt/venv)
+#    This is the "Magic Step" that makes the image small.
 COPY --from=builder /opt/venv /opt/venv
 
 # 2. Activate the virtual environment in the final image
-#    (So that 'uvicorn' is found in the path)
 ENV PATH="/opt/venv/bin:$PATH"
 
-# 3. Copy the application code
+# 3. Copy only the application code (Using .dockerignore is recommended here)
 COPY . .
 
 EXPOSE 8000
 
-# 4. Run command
+# 4. Run the application
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
