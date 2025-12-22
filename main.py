@@ -88,3 +88,8 @@ def read_root():
 @app.get("/templates/index")
 def read_index():
     print("Just to get a template index Html file ..................")
+
+@app.get("/health")
+def health_check():
+    print("This is new part to see the health opf the application ............")
+    return {"status": "ok"}
