@@ -4,31 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Number Saver</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f0f2f5; flex-direction: column; }
-        .card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; width: 300px; }
-        input { padding: 10px; width: 60%; margin-right: 5px; border: 1px solid #ccc; border-radius: 4px; }
-        button { padding: 10px; width: 25%; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        #message { margin-top: 15px; font-size: 0.9rem; min-height: 20px;}
- 
-        history-section { margin-top: 20px; text-align: left; max-height: 200px; overflow-y: auto; border-top: 1px solid #eee; padding-top: 10px;}
-        ul { list-style-type: none; padding: 0; }
-        li { background: #f9f9f9; border-bottom: 1px solid #ddd; padding: 8px; display: flex; justify-content: space-between; }
-        .timestamp { color: #888; font-size: 0.8rem; }
+        body { font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #eef2f5; flex-direction: column; color: #333; }
+        .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 400px; text-align: center; }
         
+        .input-group { display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; }
+        input { padding: 12px; width: 60%; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; outline: none; }
+        button.primary { padding: 12px 20px; background-color: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;}
+        button.primary:hover { background-color: #0056b3; }
+
+        .stats-container { display: flex; justify-content: space-between; background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem;}
+        .stat-box strong { display: block; font-size: 1.1rem; color: #007bff; }
+
+        .history-section { margin-top: 20px; text-align: left; max-height: 250px; overflow-y: auto; border-top: 1px solid #eee; padding-top: 10px;}
+        ul { list-style-type: none; padding: 0; }
+        li { background: #fff; border-bottom: 1px solid #f0f0f0; padding: 10px; display: flex; justify-content: space-between; align-items: center; }
+        
+        .val-display { font-weight: bold; font-size: 1.1rem; }
+        .id-display { font-size: 0.8rem; color: #999; margin-right: 10px; }
+        
+        .delete-btn { background: #ff4d4d; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer; font-size: 0.8rem; margin-left: 10px; opacity: 0.7; }
+        .delete-btn:hover { opacity: 1; }
+
+        #message { margin-top: 10px; height: 20px; font-size: 0.9rem; }
+        canvas { margin-top: 20px; max-height: 200px; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h2>Save a Number</h2>
-        <div>
-            <input type="number" id="numberInput" placeholder="Enter number">
-            <button onclick="submitNumber()">Save</button>
+        <h2>Number Tracker</h2>
+        
+        <div class="stats-container">
+            <div class="stat-box">Sum: <strong id="statSum">0</strong></div>
+            <div class="stat-box">Avg: <strong id="statAvg">0</strong></div>
+            <div class="stat-box">Count: <strong id="statCount">0</strong></div>
+        </div>
+
+        <div class="input-group">
+            <input type="number" id="numberInput" placeholder="Enter value..." step="any">
+            <button class="primary" onclick="submitNumber()">Save</button>
         </div>
         <div id="message"></div>
 
+        <canvas id="myChart"></canvas>
+
         <div class="history-section">
-            <h3>History</h3>
+            <h3>Recent History</h3>
             <ul id="numberList">
                 <li>Loading...</li>
             </ul>
@@ -36,35 +58,90 @@
     </div>
 
     <script>
-        window.onload = loadNumbers;
+        let myChart = null;
+        window.onload = refreshAll;
+
+        async function refreshAll() {
+            await Promise.all([loadNumbers(), loadStats()]);
+        }
+
+        async function loadStats() {
+            try {
+                const res = await fetch('/api/stats');
+                if (!res.ok) throw new Error("Stats endpoint missing"); 
+                const data = await res.json();
+                document.getElementById('statSum').innerText = data.sum;
+                document.getElementById('statAvg').innerText = data.average;
+                document.getElementById('statCount').innerText = data.count;
+            } catch (e) { console.error(e); }
+        }
 
         async function loadNumbers() {
             try {
                 const response = await fetch('/api/numbers');
                 const data = await response.json();
-                
-                const list = document.getElementById('numberList');
-                list.innerHTML = ''; // Clear current list
+                renderList(data);
+                renderChart(data);
+            } catch (error) { console.error("Error loading numbers:", error); }
+        }
 
-                if (data.length === 0) {
-                    list.innerHTML = '<li>No numbers yet</li>';
-                    return;
-                }
-                data.forEach(item => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `<span>ID: ${item.id}</span> <strong>${item.value}</strong>`;
-                    list.appendChild(li);
-                });
-            } catch (error) {
-                console.error("Error loading numbers:", error);
+        function renderList(data) {
+            const list = document.getElementById('numberList');
+            list.innerHTML = ''; 
+
+            if (data.length === 0) {
+                list.innerHTML = '<li style="justify-content:center; color:#999;">No numbers yet</li>';
+                return;
             }
+
+            data.forEach(item => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <div>
+                        <span class="id-display">#${item.id}</span>
+                        <span class="val-display">${item.value}</span>
+                    </div>
+                    <button class="delete-btn" onclick="deleteNumber(${item.id})">Delete</button>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        function renderChart(data) {
+            const ctx = document.getElementById('myChart').getContext('2d');
+            
+            // Reverse so graph goes from Left (Old) -> Right (New)
+            const chartData = [...data].reverse(); 
+            const labels = chartData.map(d => `ID: ${d.id}`);
+            const values = chartData.map(d => d.value);
+
+            if (myChart) myChart.destroy(); 
+
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Value',
+                        data: values,
+                        borderColor: '#007bff',
+                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    scales: { y: { beginAtZero: true } },
+                    plugins: { legend: { display: false } }
+                }
+            });
         }
 
         async function submitNumber() {
-            const inputVal = document.getElementById('numberInput').value;
+            const input = document.getElementById('numberInput');
             const msgDiv = document.getElementById('message');
 
-            if (!inputVal) {
+            if (!input.value) {
                 alert("Please enter a number");
                 return;
             }
@@ -73,24 +150,25 @@
                 const response = await fetch('/api/save', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ number: parseFloat(inputVal) })
+                    body: JSON.stringify({ number: parseFloat(input.value) })
                 });
 
                 if (response.ok) {
-                    msgDiv.textContent = "Saved successfully!";
+                    msgDiv.textContent = "Saved!";
                     msgDiv.style.color = "green";
-                    document.getElementById('numberInput').value = ''; 
-                    
-                    // REFRESH THE LIST immediately after saving
-                    loadNumbers(); 
-                } else {
-                    msgDiv.textContent = "Error saving.";
-                    msgDiv.style.color = "red";
+                    input.value = ''; 
+                    refreshAll();
+                    setTimeout(() => msgDiv.textContent = "", 2000);
                 }
-            } catch (error) {
-                msgDiv.textContent = "Connection error.";
-                msgDiv.style.color = "red";
-            }
+            } catch (error) { console.error(error); }
+        }
+
+        async function deleteNumber(id) {
+            if(!confirm("Delete this number?")) return;
+            try {
+                const res = await fetch(`/api/numbers/${id}`, { method: 'DELETE' });
+                if (res.ok) refreshAll();
+            } catch (error) { console.error(error); }
         }
     </script>
 </body>
