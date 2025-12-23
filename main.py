@@ -101,8 +101,14 @@ def health_check():
 
 @app.get("/ping")
 def ping():
-    return {"message": "pong"}
+    return {"message": "Hehe Ping pong"}
 
 @app.get("/new-endpoint")
 def new_endpoint():
-    return {"message": "This is a new endpoint"}
+    print("In the new end pooint")
+    return {"message": "this introduce a conflict while merging"}
+
+
+@app.get("/new-feature")
+def new_feature():
+    return {"feature": "This is a new feature added to the application"}
