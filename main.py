@@ -126,3 +126,9 @@ def new_feature():
 def another_endpoint():
     print("Another endpoint reached!")
     return {"message": "You have reached another endpoint"}
+
+
+@app.get("/Dhawala")
+def dhawala_function():
+    print("Dhawala Sanka rajakaruna ")
+    return {"message": "Dhawala Sanka rajakaruna "}
