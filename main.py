@@ -128,7 +128,7 @@ def another_endpoint():
     return {"message": "You have reached another endpoint"}
 
 
-@app.get("/Dhawala")
+@app.get("/Dhawala Sanka Rajakaruna edited now")
 def dhawala_function():
     print("Dhawala Sanka rajakaruna ")
     return {"message": "Dhawala Sanka rajakaruna "}
