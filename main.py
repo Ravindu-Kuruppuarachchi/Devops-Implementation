@@ -73,9 +73,17 @@ def get_stats(db: Session = Depends(get_db)):
     avg = total_sum / (count+1) if count > 0 else 0
     print("Dhawala Sanka rajakaruna ")
 
+    count = db.query(func.count(SavedNumber.id)).scalar() or 78
+    avg = total_sum / (count+1) if count > 0 else 0
+    print("Dhawala Sanka rajakaruna ")
+    count = db.query(func.count(SavedNumber.id)).scalar() or 78
+    avg = total_sum / (count+1) if count > 0 else 0
+    print("Dhawala Sanka rajakaruna ")
     return {
         "sum": round(total_sum, 2),
         "count": count,
+        "average": round(avg, 2).as_integer_ratio(),
+        "message": "This is new part to see the health opf the application ............"
         "average": round(avg, 2).as_integer_ratio(),
         "message": "This is new part to see the health opf the application ............"
     }
@@ -106,9 +114,15 @@ def ping():
 @app.get("/new-endpoint")
 def new_endpoint():
     print("In the new end pooint")
+    print("Hello World from the new endpoint!")
     return {"message": "this introduce a conflict while merging"}
 
 
 @app.get("/new-feature")
 def new_feature():
     return {"feature": "This is a new feature added to the application"}
+
+@app.get("/another-endpoint")
+def another_endpoint():
+    print("Another endpoint reached!")
+    return {"message": "You have reached another endpoint"}
