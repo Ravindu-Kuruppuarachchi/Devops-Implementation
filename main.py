@@ -102,34 +102,5 @@ def read_index(x:int=0):
         return FileResponse('templates/index.html')
     print("updated the temoplates index file ............")
 
-@app.get("/health")
-def health_check():
-    print("This is new part to see the health opf the application ............")
-    return {"status": "ok"}
 
-@app.get("/ping")
-def ping():
-    return {"message": "Hehe Ping pong"}
-
-@app.get("/new")
-def new_endpoint():
-    print("In the new end pooint")
-    print("Hello World from the new endpoint!")
-    return {"message": "this introduce a conflict while merging"}
-
-
-@app.get("/new-feature")
-def new_feature():
-    return {"fe": "Tlogin made changes"}
-
-@app.get("/another-endpoint")
-def another_endpoint():
-    print("Another endpoint reached!")
-    return {"message": "You have reached another endpoint"}
-
-# This made in Dhawal branch
-@app.get("/conflict-endpoint")
-def conflict_endpoint():
-    print("This is to create a merge conflict")
-    return {"message": "Merge conflict endpoint"}
 
