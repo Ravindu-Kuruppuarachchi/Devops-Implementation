@@ -148,3 +148,7 @@ class SavedNumber(Base):
 class NumberInput(BaseModel):
     number: float
     category: str = "general"  # Optional field, defaults to "general"
+# This login is made by login/feature branch
+@app.get("/login-feature")
+def login_feature():
+    return {"feature": "Login feature implemented"}
