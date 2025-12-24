@@ -127,9 +127,11 @@ def another_endpoint():
     print("Another endpoint reached!")
     return {"message": "You have reached another endpoint"}
 
-# This made in Dhawal branch
-@app.get("/conflict-endpoint")
-def conflict_endpoint():
-    print("This is to create a merge conflict")
-    return {"message": "Merge conflict endpoint"}
-
+#added new
+@app.get("/feature-endpoint")
+def feature_endpoint():
+    return {"feature": "This is a new feature endpoint added in the feature branch"}    
+@app.get("/debug-endpoint")
+def debug_endpoint():
+    print("Debugging endpoint reached!")
+    return {"message": "Debugging information"}
