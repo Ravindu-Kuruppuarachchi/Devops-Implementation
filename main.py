@@ -132,3 +132,8 @@ def another_endpoint():
 def conflict_endpoint():
     print("This is to create a merge conflict")
     return {"message": "Merge conflict endpoint"}
+
+# This login is made by login/feature branch
+@app.get("/login-feature")
+def login_feature():
+    return {"feature": "Login feature implemented"}
