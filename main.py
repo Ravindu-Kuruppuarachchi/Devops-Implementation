@@ -203,3 +203,9 @@ def feature_for_practice():
 def feature_check():
     print("This endpoint is to check feature branch")
     return {"message": "Feature branch check endpoint"} 
+
+
+@app.get("/another-new-endpoint")
+def another_new_endpoint():
+    print("Another new endpoint reached!")
+    return {"message": "You have reached another new endpoint"} 
