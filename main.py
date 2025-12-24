@@ -122,3 +122,10 @@ def get_stats(db: Session = Depends(get_db)):
     }
 
 
+#added while feature login
+@app.get("/feature/login")
+def read_login():
+    return FileResponse('templates/login.html')
+@app.get("/feature/dashboard")
+def read_dashboard():
+    return FileResponse('templates/dashboard.html')
