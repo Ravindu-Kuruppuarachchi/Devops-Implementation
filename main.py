@@ -194,3 +194,8 @@ def get_grouped_stats(db: Session = Depends(get_db)):
 def conflict_check():
     print("This endpoint is to create a merge conflict")
     return {"message": "Conflict check endpoint"}
+
+@app.get("/feature-check")
+def feature_check():
+    print("This endpoint is to check feature branch")
+    return {"message": "Feature branch check endpoint"} 
