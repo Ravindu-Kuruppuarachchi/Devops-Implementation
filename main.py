@@ -152,3 +152,13 @@ class NumberInput(BaseModel):
 @app.get("/login-feature")
 def login_feature():
     return {"feature": "Login feature implemented"}
+
+
+@app.post("/api/save")
+def save_number(data: NumberInput, db: Session = Depends(get_db)):
+    # Create entry with the new category field
+    new_entry = SavedNumber(value=data.number, category=data.category)
+    db.add(new_entry)
+    db.commit()
+    db.refresh(new_entry) 
+    return new_entry
