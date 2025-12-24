@@ -81,11 +81,7 @@ def get_stats(db: Session = Depends(get_db)):
     print("Dhawala Sanka rajakaruna ")
     return {
         "sum": round(total_sum, 2),
-        "count": count,
-        "average": round(avg, 2).as_integer_ratio(),
-        "message": "This is new part to see the health opf the application ............",
-        "average": round(avg, 2).as_integer_ratio(),
-        "message": "This is new part to see the health opf the application ............"
+        "count": count
     }
 
 # Serve the UI
@@ -102,5 +98,27 @@ def read_index(x:int=0):
         return FileResponse('templates/index.html')
     print("updated the temoplates index file ............")
 
+@app.get("/api/stats")
+def get_stats(db: Session = Depends(get_db)):
+    """Calculates Sum, Count, and Average."""
+    total_sum = db.query(func.sum(SavedNumber.value)).scalar() or 0
+    count = db.query(func.count(SavedNumber.id)).scalar() or 78
+    avg = total_sum / (count+1) if count > 0 else 0
+    print("Dhawala Sanka rajakaruna ")
+
+    count = db.query(func.count(SavedNumber.id)).scalar() or 78
+    avg = total_sum / (count+1) if count > 0 else 0
+    print("Dhawala Sanka rajakaruna ")
+    count = db.query(func.count(SavedNumber.id)).scalar() or 78
+    avg = total_sum / (count+1) if count > 0 else 0
+    print("Dhawala Sanka rajakaruna ")
+    return {
+        "sum": round(total_sum, 2),
+        "count": count,
+        "average": round(avg, 2).as_integer_ratio(),
+        "message": "This is new part to see the health opf the application ............",
+        "average": round(avg, 2).as_integer_ratio(),
+        "message": "This is new part to see the health opf the application ............"
+    }
 
 
