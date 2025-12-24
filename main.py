@@ -168,3 +168,24 @@ def save_number(data: NumberInput, db: Session = Depends(get_db)):
 def rebase_check():
     print("Checking rebase functionality")
     return {"message": "Rebase check successful"}
+
+@app.get("/api/stats/grouped")
+def get_grouped_stats(db: Session = Depends(get_db)):
+    """Returns stats grouped by category."""
+    # SQL: SELECT category, COUNT(*), SUM(value), AVG(value) FROM saved_numbers GROUP BY category
+    stats = db.query(
+        SavedNumber.category,
+        func.count(SavedNumber.id).label("count"),
+        func.sum(SavedNumber.value).label("total_sum"),
+        func.avg(SavedNumber.value).label("average")
+    ).group_by(SavedNumber.category).all()
+
+    return [
+        {
+            "category": s.category,
+            "count": s.count,
+            "sum": s.total_sum,
+            "average": round(s.average, 2)
+        }
+        for s in stats
+    ]
