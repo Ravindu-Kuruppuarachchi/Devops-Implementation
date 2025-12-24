@@ -132,3 +132,19 @@ def another_endpoint():
 def conflict_endpoint():
     print("This is to create a merge conflict")
     return {"message": "Merge conflict endpoint"}
+
+
+from sqlalchemy import String  # Import String
+
+# --- DATABASE MODEL ---
+class SavedNumber(Base):
+    __tablename__ = "saved_numbers"
+    id = Column(Integer, primary_key=True, index=True)
+    value = Column(Float, nullable=False)
+    # New Field: default to 'general' so old rows don't break
+    category = Column(String, default="general", index=True) 
+
+# --- PYDANTIC SCHEMAS ---
+class NumberInput(BaseModel):
+    number: float
+    category: str = "general"  # Optional field, defaults to "general"
