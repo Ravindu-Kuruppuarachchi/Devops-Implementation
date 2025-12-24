@@ -189,3 +189,8 @@ def get_grouped_stats(db: Session = Depends(get_db)):
         }
         for s in stats
     ]
+# New conflict check latest
+@app.get("/conflict-check")
+def conflict_check():
+    print("This endpoint is to create a merge conflict")
+    return {"message": "Conflict check endpoint"}
