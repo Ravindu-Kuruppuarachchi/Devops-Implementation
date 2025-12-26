@@ -125,3 +125,6 @@ def get_stats(db: Session = Depends(get_db)):
 def new_feature():
     return {"message": "This is a newly added feature endpoint."}
 
+@app.get("/feature-update")
+def update_feature():
+    return {"message": "This is an updated feature endpoint."}
