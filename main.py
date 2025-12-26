@@ -120,5 +120,8 @@ def get_stats(db: Session = Depends(get_db)):
         "average": round(avg, 2).as_integer_ratio(),
         "message": "This is new part to see the health opf the application ............"
     }
-
+#added new part here
+@app.get("/feature-new")
+def new_feature():
+    return {"message": "This is a newly added feature endpoint."}
 
